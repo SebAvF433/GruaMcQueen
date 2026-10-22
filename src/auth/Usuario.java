@@ -1,4 +1,4 @@
-package modelo;
+package auth;
 
 public class Usuario {
     String nombre;

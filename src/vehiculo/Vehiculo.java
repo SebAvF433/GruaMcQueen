@@ -1,4 +1,4 @@
-package modelo;
+package vehiculo;
 
 public class Vehiculo{
     String marca;

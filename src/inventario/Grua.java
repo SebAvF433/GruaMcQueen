@@ -1,4 +1,4 @@
-package modelo;
+package inventario;
 
 public class Grua {
     String nombre_conductor;

@@ -1,4 +1,4 @@
-package solicitudes;
+package solicitud;
     public enum EstadoSolicitudes{
         solicitada("SOLICITADA"), 
         asignada("ASIGNADA"), 

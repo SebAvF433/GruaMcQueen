@@ -1,7 +1,7 @@
-package solicitudes;
+package solicitud;
 
-import modelo.Usuario;
-import modelo.Vehiculo;
+import auth.Usuario;
+import vehiculo.Vehiculo;
 import vehiculo.VehiculoServicio;
 
 /** Reglas de negocio de las solicitudes de servicio. */

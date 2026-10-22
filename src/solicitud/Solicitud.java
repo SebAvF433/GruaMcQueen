@@ -1,8 +1,9 @@
-package solicitudes;
+package solicitud;
 
 import java.time.LocalDateTime;
-import modelo.Usuario;
-import modelo.Vehiculo;
+
+import auth.Usuario;
+import vehiculo.Vehiculo;
 
 public class Solicitud {
 
