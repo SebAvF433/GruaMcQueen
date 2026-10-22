@@ -36,7 +36,7 @@ public class SolicitudServicio {
         // 2. El vehículo debe existir y ser del cliente que solicita
         String placaNormalizada = placa.trim().toUpperCase();
         Vehiculo vehiculo = vehiculoServicio.buscarPorPlaca(placaNormalizada)
-                .filter(v -> v.getPropietario().getUsuario().equals(cliente.getUsuario()))
+                .filter(v -> v.getPropietario(), .getUsuario().equals(cliente.getUsuario()))
                 .orElseThrow(() -> 
                 System.out.println("No se encontró un vehículo con la placa " + placaNormalizada + " entre sus vehículos."));
 
