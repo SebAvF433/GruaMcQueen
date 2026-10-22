@@ -1,9 +1,9 @@
 package test;
 
-import auth.Rol;
+import modelo.Rol;
 import auth.Usuario;
-import comun.DatoInvalidoException;
-import comun.ReglaNegocioException;
+import excepcion.DatoInvalidoException;
+import excepcion.ReglaNegocioException;
 import inventario.EstadoGrua;
 import inventario.Grua;
 import inventario.GruaRepositorio;
@@ -36,8 +36,8 @@ public class SolicitudCancelarTest {
         System.out.println("\n== Solicitudes (HU-15) ==");
 
         // --- Preparación (si algún nombre de su proyecto es distinto, se ajusta solo aquí) ---
-        Usuario ana = new Usuario("U1", "Ana", "ana", "1234", Rol.CLIENTE);
-        Usuario luis = new Usuario("U2", "Luis", "luis", "1234", Rol.CLIENTE);
+        Usuario ana = new Usuario("Ana", "ana", "1234", Rol.CLIENTE);
+        Usuario luis = new Usuario("Luis", "luis", "1234", Rol.CLIENTE);
 
         VehiculoServicio vehiculos = new VehiculoServicio(new VehiculoRepositorio());
         vehiculos.registrar(ana, "AAA111", TipoVehiculo.AUTOMOVIL, "Renault");
@@ -53,10 +53,10 @@ public class SolicitudCancelarTest {
         SolicitudServicio servicio =
                 new SolicitudServicio(new SolicitudRepositorio(), vehiculos, gruas);
 
-        Solicitud sSolicitada = servicio.crearSolicitud(ana, "AAA111", "Calle 1", "Calle 2");
-        Solicitud sAsignada   = servicio.crearSolicitud(ana, "BBB222", "Calle 3", "Calle 4");
-        Solicitud sEnCurso    = servicio.crearSolicitud(ana, "CCC333", "Calle 5", "Calle 6");
-        Solicitud sFinalizada = servicio.crearSolicitud(ana, "DDD444", "Calle 7", "Calle 8");
+        Solicitud sSolicitada = servicio.crearSolicitud(ana, "AAA111", "Calle 1", "Calle 2", 10);
+        Solicitud sAsignada   = servicio.crearSolicitud(ana, "BBB222", "Calle 3", "Calle 4", 10);
+        Solicitud sEnCurso    = servicio.crearSolicitud(ana, "CCC333", "Calle 5", "Calle 6", 10);
+        Solicitud sFinalizada = servicio.crearSolicitud(ana, "DDD444", "Calle 7", "Calle 8", 10);
 
         // Se deja cada solicitud en el estado que se quiere probar (la asignación real es la HU-16)
         grua.setEstado(EstadoGrua.EN_SERVICIO);
@@ -97,7 +97,7 @@ public class SolicitudCancelarTest {
                 lanza(() -> servicio.cancelarSolicitud(sSolicitada.getId(), ana)));
 
         // --- Ajena, inexistente e identificador vacío ---
-        Solicitud sAjena = servicio.crearSolicitud(ana, "EEE555", "Calle 9", "Calle 10");
+        Solicitud sAjena = servicio.crearSolicitud(ana, "EEE555", "Calle 9", "Calle 10", 10);
         verificar("Ajena: otro cliente no puede cancelarla",
                 lanza(() -> servicio.cancelarSolicitud(sAjena.getId(), luis)));
         verificar("Ajena: sigue SOLICITADA (sin modificar nada)",
@@ -111,7 +111,7 @@ public class SolicitudCancelarTest {
         servicio.cancelarSolicitud(sAjena.getId().toLowerCase(), ana);
         verificar("Identificador en minúsculas: también cancela",
                 sAjena.getEstado() == EstadoSolicitud.CANCELADA);
-        Solicitud nueva = servicio.crearSolicitud(ana, "EEE555", "Calle 9", "Calle 10");
+        Solicitud nueva = servicio.crearSolicitud(ana, "EEE555", "Calle 9", "Calle 10", 10);
         verificar("Tras cancelar, el vehículo puede solicitar otra grúa",
                 nueva.getEstado() == EstadoSolicitud.SOLICITADA);
     }

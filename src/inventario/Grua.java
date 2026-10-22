@@ -1,25 +1,38 @@
 package inventario;
 
 public class Grua {
-    String nombre_conductor;
-    String modelo;
-    String marca;
-    String placa;
-    String color;
+    private final String placa;
+    private TipoGrua tipo;
+    private EstadoGrua estado;
 
-    public Grua(String nombre_conductor, String modelo, String marca, String placa, String color){
-        this.nombre_conductor = nombre_conductor;
-        this.modelo = modelo;
-        this.marca = marca;
-        this.placa = placa;
-        this.color = color;
+    public Grua(String placa, TipoGrua tipo) {
+        if (placa == null || placa.isBlank()) {
+            throw new IllegalArgumentException("La placa de la grúa es obligatoria.");
+        }
+        if (tipo == null) {
+            throw new IllegalArgumentException("El tipo de grúa es obligatorio.");
+        }
+        this.placa = placa.trim().toUpperCase();
+        this.tipo = tipo;
+        this.estado = EstadoGrua.DISPONIBLE; // Por defecto nace disponible (HU-10)
     }
 
-    void mostrarGrua(){
-        System.out.println("Conductor: " + nombre_conductor);
-        System.out.println("Marca: " + marca);
-        System.out.println("Modelo: " + modelo);
-        System.out.println("Placa: " + placa);
-        System.out.println("Color: " + color);
+    public String getPlaca() {
+        return placa;
+    }
+
+    public TipoGrua getTipo() {
+        return tipo;
+    }
+
+    public EstadoGrua getEstado() {
+        return estado;
+    }
+
+    public void setEstado(EstadoGrua estado) {
+        if (estado == null) {
+            throw new IllegalArgumentException("El estado no puede ser nulo.");
+        }
+        this.estado = estado;
     }
 }

@@ -1,16 +1,15 @@
 package auth;
-
 import excepcion.DatoInvalidoException;
 import excepcion.ReglaNegocioException;
 import modelo.Rol;
 
 /** Reglas de negocio de la autenticación: registro, inicio y cierre de sesión. */
-public class AuthServicio {
+public class AuthServicio{
 
     private final UsuarioRepositorio repositorio;
     private Usuario usuarioActivo;
 
-    public AuthServicio(UsuarioRepositorio repositorio) {
+    public AuthServicio(UsuarioRepositorio repositorio){
         this.repositorio = repositorio;
     }
 
@@ -19,13 +18,12 @@ public class AuthServicio {
      * Si algo no se cumple lanza una excepción y NO guarda nada.
      */
     public Usuario registrarCliente(String nombre, String usuario, String clave) {
-        exigirTexto(nombre, "El nombre no puede estar vacío.");
-        exigirTexto(usuario, "El usuario no puede estar vacío.");
-        exigirTexto(clave, "La clave no puede estar vacía.");
+        exigirTexto(nombre, "Error. El nombre no puede estar vacío.");
+        exigirTexto(usuario, "Error. El usuario no puede estar vacío.");
+        exigirTexto(clave, "Error. La clave no puede estar vacía.");
 
-        if (repositorio.buscarPorUsuario(usuario).isPresent()) {
-            throw new ReglaNegocioException(
-                "El usuario \"" + usuario.trim() + "\" ya está registrado. Elija otro nombre de usuario.");
+        if (repositorio.buscarPorUsuario(usuario).isPresent()){
+            throw new ReglaNegocioException("El usuario " + usuario.trim() + " ya está registrado. Elija otro nombre de usuario.");
         }
 
         Usuario nuevo = new Usuario(nombre.trim(), usuario, clave, Rol.CLIENTE);
@@ -49,19 +47,19 @@ public class AuthServicio {
         return encontrado;
     }
 
-    public void cerrarSesion() {
+    public void cerrarSesion(){
         usuarioActivo = null;
     }
 
-    public Usuario getUsuarioActivo() {
+    public Usuario getUsuarioActivo(){
         return usuarioActivo;
     }
 
-    public boolean haySesionActiva() {
+    public boolean haySesionActiva(){
         return usuarioActivo != null;
     }
 
-    private void exigirTexto(String valor, String mensaje) {
+    private void exigirTexto(String valor, String mensaje){
         if (valor == null || valor.isBlank()) {
             throw new DatoInvalidoException(mensaje);
         }

@@ -1,9 +1,9 @@
 package test;
 
-import auth.Rol;
+import modelo.Rol;
 import auth.Usuario;
-import comun.DatoInvalidoException;
-import comun.ReglaNegocioException;
+import excepcion.DatoInvalidoException;
+import excepcion.ReglaNegocioException;
 import inventario.EstadoGrua;
 import inventario.Grua;
 import inventario.GruaRepositorio;
@@ -29,7 +29,7 @@ public class SolicitudEstadosTest {
 
     /** Un entorno limpio para cada caso. Si algún nombre de su proyecto es distinto, se ajusta aquí. */
     private static class Entorno {
-        final Usuario ana = new Usuario("U1", "Ana", "ana", "1234", Rol.CLIENTE);
+        final Usuario ana = new Usuario("Ana", "ana", "1234", Rol.CLIENTE);
         final VehiculoServicio vehiculos = new VehiculoServicio(new VehiculoRepositorio());
         final GruaServicio gruas = new GruaServicio(new GruaRepositorio());
         final SolicitudServicio servicio =
@@ -37,7 +37,7 @@ public class SolicitudEstadosTest {
 
         Solicitud solicitar(String placa) {
             vehiculos.registrar(ana, placa, TipoVehiculo.AUTOMOVIL, "Marca");
-            return servicio.crearSolicitud(ana, placa, "Calle 1", "Calle 2");
+            return servicio.crearSolicitud(ana, placa, "Calle 1", "Calle 2", 10);
         }
 
         Grua grua(String placa) {

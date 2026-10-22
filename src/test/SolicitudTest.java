@@ -1,10 +1,12 @@
 package test;
 
-import auth.Rol;
+import modelo.Rol;
 import auth.Usuario;
-import comun.DatoInvalidoException;
-import comun.ReglaNegocioException;
-import solicitud.EstadoSolicitudes;
+import excepcion.DatoInvalidoException;
+import excepcion.ReglaNegocioException;
+import inventario.GruaRepositorio;
+import inventario.GruaServicio;
+import solicitud.EstadoSolicitud;
 import solicitud.Solicitud;
 import solicitud.SolicitudRepositorio;
 import solicitud.SolicitudServicio;
@@ -16,6 +18,18 @@ import java.util.List;
 /** Pruebas de las solicitudes: HU-13 (solicitar) y HU-14 (consultar mis solicitudes). */
 public class SolicitudTest {
 
+    static int ok = 0, fallos = 0;
+
+    static void verificar(String nombre, boolean condicion) {
+        if (condicion) { ok++; System.out.println("[OK]    " + nombre); }
+        else { fallos++; System.out.println("[FALLO] " + nombre); }
+    }
+
+    public static void main(String[] args) {
+        ejecutar();
+        System.out.println("\nPasaron: " + ok + " | Fallaron: " + fallos);
+    }
+
     public static void ejecutar() {
         probarSolicitar();
         probarListarPorCliente();
@@ -25,42 +39,42 @@ public class SolicitudTest {
     private static void probarSolicitar() {
         System.out.println("\n== Solicitudes (HU-13) ==");
 
-        Usuario ana = new Usuario("U1", "Ana", "ana", "1234", Rol.cliente);
-        Usuario luis = new Usuario("U2", "Luis", "luis", "1234", Rol.cliente);
+        Usuario ana = new Usuario("Ana", "ana", "1234", Rol.CLIENTE);
+        Usuario luis = new Usuario("Luis", "luis", "1234", Rol.CLIENTE);
 
         VehiculoServicio vehiculos = new VehiculoServicio(new VehiculoRepositorio());
-        vehiculos.registrar(ana, "ABC123", TipoVehiculo.automovil, "Renault");
-        vehiculos.registrar(luis, "XYZ789", TipoVehiculo.camion, "Chevrolet");
+        vehiculos.registrar(ana, "ABC123", TipoVehiculo.AUTOMOVIL, "Renault");
+        vehiculos.registrar(luis, "XYZ789", TipoVehiculo.CAMION, "Chevrolet");
 
         SolicitudRepositorio repo = new SolicitudRepositorio();
-        SolicitudServicio servicio = new SolicitudServicio(repo, vehiculos);
+        SolicitudServicio servicio = new SolicitudServicio(repo, vehiculos, new GruaServicio(new GruaRepositorio()));
 
-        Solicitud s1 = servicio.crear(ana, "ABC123", "Calle 10", "Calle 80");
-        TestRunner.verificar("Normal: la solicitud queda SOLICITADA",
-                s1.getEstado() == EstadoSolicitudes.solicitada);
-        TestRunner.verificar("Normal: se guarda y recibe el id SOL-001",
+        Solicitud s1 = servicio.crearSolicitud(ana, "ABC123", "Calle 10", "Calle 80", 10);
+        verificar("Normal: la solicitud queda SOLICITADA",
+                s1.getEstado() == EstadoSolicitud.SOLICITADA);
+        verificar("Normal: se guarda y recibe el id SOL-001",
                 repo.listar().size() == 1 && s1.getId().equals("SOL-001"));
 
-        TestRunner.verificar("Activa duplicada: se rechaza",
-                lanza(() -> servicio.crear(ana, "ABC123", "Calle 1", "Calle 2")));
-        TestRunner.verificar("Vehículo ajeno: se rechaza",
-                lanza(() -> servicio.crear(ana, "XYZ789", "Calle 1", "Calle 2")));
-        TestRunner.verificar("Vehículo inexistente: se rechaza",
-                lanza(() -> servicio.crear(ana, "QQQ000", "Calle 1", "Calle 2")));
-        TestRunner.verificar("Origen vacío: se rechaza",
-                lanza(() -> servicio.crear(ana, "ABC123", "  ", "Calle 2")));
-        TestRunner.verificar("Destino vacío: se rechaza",
-                lanza(() -> servicio.crear(ana, "ABC123", "Calle 1", "")));
-        TestRunner.verificar("Origen igual al destino: se rechaza",
-                lanza(() -> servicio.crear(ana, "ABC123", "Calle 1", "calle 1")));
-        TestRunner.verificar("Rechazadas: no se guarda ninguna (sigue 1)",
+        verificar("Activa duplicada: se rechaza",
+                lanza(() -> servicio.crearSolicitud(ana, "ABC123", "Calle 1", "Calle 2", 10)));
+        verificar("Vehículo ajeno: se rechaza",
+                lanza(() -> servicio.crearSolicitud(ana, "XYZ789", "Calle 1", "Calle 2", 10)));
+        verificar("Vehículo inexistente: se rechaza",
+                lanza(() -> servicio.crearSolicitud(ana, "QQQ000", "Calle 1", "Calle 2", 10)));
+        verificar("Origen vacío: se rechaza",
+                lanza(() -> servicio.crearSolicitud(ana, "ABC123", "  ", "Calle 2", 10)));
+        verificar("Destino vacío: se rechaza",
+                lanza(() -> servicio.crearSolicitud(ana, "ABC123", "Calle 1", "", 10)));
+        verificar("Origen igual al destino: se rechaza",
+                lanza(() -> servicio.crearSolicitud(ana, "ABC123", "Calle 1", "calle 1", 10)));
+        verificar("Rechazadas: no se guarda ninguna (sigue 1)",
                 repo.listar().size() == 1);
 
         s1.setEstado(EstadoSolicitud.CANCELADA);
-        Solicitud s2 = servicio.crear(ana, "abc123", "Calle 5", "Calle 50");
-        TestRunner.verificar("Tras cancelar, el vehículo puede solicitar otra (placa en minúsculas)",
+        Solicitud s2 = servicio.crearSolicitud(ana, "abc123", "Calle 5", "Calle 50", 10);
+        verificar("Tras cancelar, el vehículo puede solicitar otra (placa en minúsculas)",
                 s2.getVehiculo().getPlaca().equals("ABC123"));
-        TestRunner.verificar("Las rechazadas no consumen ids: la siguiente es SOL-002",
+        verificar("Las rechazadas no consumen ids: la siguiente es SOL-002",
                 s2.getId().equals("SOL-002") && repo.listar().size() == 2);
     }
 
@@ -69,40 +83,40 @@ public class SolicitudTest {
         System.out.println("\n== Solicitudes (HU-14) ==");
 
         // Tres clientes: Ana (2 vehículos), Luis (1 vehículo) y Marta (sin solicitudes)
-        Usuario ana = new Usuario("U1", "Ana", "ana", "1234", Rol.CLIENTE);
-        Usuario luis = new Usuario("U2", "Luis", "luis", "1234", Rol.CLIENTE);
-        Usuario marta = new Usuario("U3", "Marta", "marta", "1234", Rol.CLIENTE);
+        Usuario ana = new Usuario("Ana", "ana", "1234", Rol.CLIENTE);
+        Usuario luis = new Usuario("Luis", "luis", "1234", Rol.CLIENTE);
+        Usuario marta = new Usuario("Marta", "marta", "1234", Rol.CLIENTE);
 
         VehiculoServicio vehiculos = new VehiculoServicio(new VehiculoRepositorio());
         vehiculos.registrar(ana, "ABC123", TipoVehiculo.AUTOMOVIL, "Renault");
         vehiculos.registrar(ana, "DEF456", TipoVehiculo.MOTO, "Yamaha");
         vehiculos.registrar(luis, "XYZ789", TipoVehiculo.CAMION, "Chevrolet");
 
-        SolicitudServicio servicio = new SolicitudServicio(new SolicitudRepositorio(), vehiculos);
-        Solicitud a1 = servicio.crear(ana, "ABC123", "Calle 10", "Calle 80");
-        servicio.crear(ana, "DEF456", "Carrera 7", "Calle 100");
-        servicio.crear(luis, "XYZ789", "Avenida Boyacá", "Calle 26");
+        SolicitudServicio servicio = new SolicitudServicio(new SolicitudRepositorio(), vehiculos, new GruaServicio(new GruaRepositorio()));
+        Solicitud a1 = servicio.crearSolicitud(ana, "ABC123", "Calle 10", "Calle 80", 10);
+        servicio.crearSolicitud(ana, "DEF456", "Carrera 7", "Calle 100", 10);
+        servicio.crearSolicitud(luis, "XYZ789", "Avenida Boyacá", "Calle 26", 10);
 
         // Con solicitudes
         List<Solicitud> deAna = servicio.listarPorCliente(ana);
-        TestRunner.verificar("Con solicitudes: Ana ve sus 2 solicitudes", deAna.size() == 2);
-        TestRunner.verificar("Con solicitudes: salen en orden de creación (SOL-001, SOL-002)",
+        verificar("Con solicitudes: Ana ve sus 2 solicitudes", deAna.size() == 2);
+        verificar("Con solicitudes: salen en orden de creación (SOL-001, SOL-002)",
                 deAna.get(0).getId().equals("SOL-001") && deAna.get(1).getId().equals("SOL-002"));
 
         // Dos clientes distintos
-        TestRunner.verificar("Dos clientes: todas las solicitudes de Ana son de Ana",
+        verificar("Dos clientes: todas las solicitudes de Ana son de Ana",
                 deAna.stream().allMatch(s -> s.getCliente().getUsuario().equals("ana")));
         List<Solicitud> deLuis = servicio.listarPorCliente(luis);
-        TestRunner.verificar("Dos clientes: Luis ve solo la suya (SOL-003)",
+        verificar("Dos clientes: Luis ve solo la suya (SOL-003)",
                 deLuis.size() == 1 && deLuis.get(0).getId().equals("SOL-003"));
 
         // Sin solicitudes
-        TestRunner.verificar("Sin solicitudes: Marta recibe una lista vacía",
+        verificar("Sin solicitudes: Marta recibe una lista vacía",
                 servicio.listarPorCliente(marta).isEmpty());
 
         // Estado actual
         a1.setEstado(EstadoSolicitud.CANCELADA);
-        TestRunner.verificar("Estado actual: el listado refleja el cambio de estado",
+        verificar("Estado actual: el listado refleja el cambio de estado",
                 servicio.listarPorCliente(ana).get(0).getEstado() == EstadoSolicitud.CANCELADA);
     }
 

@@ -1,9 +1,9 @@
 package test;
 
-import auth.Rol;
+import modelo.Rol;
 import auth.Usuario;
-import comun.DatoInvalidoException;
-import comun.ReglaNegocioException;
+import excepcion.DatoInvalidoException;
+import excepcion.ReglaNegocioException;
 import inventario.EstadoGrua;
 import inventario.Grua;
 import inventario.GruaRepositorio;
@@ -30,7 +30,7 @@ public class SolicitudAsignarTest {
     /** Un entorno limpio para cada caso, así los casos no se afectan entre sí. */
     private static class Entorno {
         // Si algún nombre de su proyecto es distinto, se ajusta solo en esta clase
-        final Usuario ana = new Usuario("U1", "Ana", "ana", "1234", Rol.CLIENTE);
+        final Usuario ana = new Usuario("Ana", "ana", "1234", Rol.CLIENTE);
         final VehiculoServicio vehiculos = new VehiculoServicio(new VehiculoRepositorio());
         final GruaServicio gruas = new GruaServicio(new GruaRepositorio());
         final SolicitudServicio servicio =
@@ -38,7 +38,7 @@ public class SolicitudAsignarTest {
 
         Solicitud solicitar(String placa, TipoVehiculo tipo) {
             vehiculos.registrar(ana, placa, tipo, "Marca");
-            return servicio.crearSolicitud(ana, placa, "Calle 1", "Calle 2");
+            return servicio.crearSolicitud(ana, placa, "Calle 1", "Calle 2", 10);
         }
 
         Grua grua(String placa, TipoGrua tipo, EstadoGrua estado) {
@@ -110,7 +110,7 @@ public class SolicitudAsignarTest {
         // --- Grúa en mantenimiento o en servicio ---
         e = new Entorno();
         s = e.solicitar("AAA111", TipoVehiculo.AUTOMOVIL);
-        e.grua("GRU001", TipoGrua.PLATAFORMA, EstadoGrua.MANTENIMIENTO);
+        e.grua("GRU001", TipoGrua.PLATAFORMA, EstadoGrua.EN_MANTENIMIENTO);
         final Entorno e4 = e; final Solicitud s4 = s;
         verificar("Grúa en MANTENIMIENTO: no se asigna",
                 lanza(() -> e4.servicio.asignarGrua(s4.getId())));
@@ -125,7 +125,7 @@ public class SolicitudAsignarTest {
         e = new Entorno();
         s = e.solicitar("AAA111", TipoVehiculo.AUTOMOVIL);
         e.grua("GRU001", TipoGrua.PLATAFORMA, EstadoGrua.EN_SERVICIO);
-        e.grua("GRU002", TipoGrua.PLATAFORMA, EstadoGrua.MANTENIMIENTO);
+        e.grua("GRU002", TipoGrua.PLATAFORMA, EstadoGrua.EN_MANTENIMIENTO);
         g = e.grua("GRU003", TipoGrua.ARRASTRE, EstadoGrua.DISPONIBLE);
         e.servicio.asignarGrua(s.getId());
         verificar("Entre varias grúas, se asigna solo la que está DISPONIBLE", s.getGrua() == g);

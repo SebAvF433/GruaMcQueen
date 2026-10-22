@@ -3,6 +3,7 @@ package solicitud;
 import java.time.LocalDateTime;
 
 import auth.Usuario;
+import inventario.Grua;
 import vehiculo.Vehiculo;
 
 public class Solicitud {
@@ -11,43 +12,65 @@ public class Solicitud {
     private final Usuario cliente;
     private final Vehiculo vehiculo;
     private final String origen;
+    private final String destino;
+    private final double km;
     private final LocalDateTime fechaHora;
-    private EstadoSolicitudes estado;
+    private EstadoSolicitud estado;
+    private Grua grua;
 
-    public Solicitud(String id, Usuario cliente, Vehiculo vehiculo, String origen, String destino){
+    public Solicitud(String id, Usuario cliente, Vehiculo vehiculo, String origen, String destino, double km) {
         this.id = id;
         this.cliente = cliente;
         this.vehiculo = vehiculo;
         this.origen = origen;
+        this.destino = destino;
+        this.km = km;
         this.fechaHora = LocalDateTime.now();
-        this.estado = EstadoSolicitudes.solicitada;
+        this.estado = EstadoSolicitud.SOLICITADA;
     }
 
-    public String getId(){
+    public String getId() {
         return id;
     }
 
-    public Usuario getCliente(){
+    public Usuario getCliente() {
         return cliente;
     }
 
-    public Vehiculo getVehiculo(){
+    public Vehiculo getVehiculo() {
         return vehiculo;
     }
 
-    public String getOrigen(){
+    public String getOrigen() {
         return origen;
     }
 
-    public LocalDateTime getFechaHora(){
+    public String getDestino() {
+        return destino;
+    }
+
+    public double getKm() {
+        return km;
+    }
+
+    public LocalDateTime getFechaHora() {
         return fechaHora;
     }
 
-    public EstadoSolicitudes getEstado(){
+    public EstadoSolicitud getEstado() {
         return estado;
     }
 
-    public void setEstado(EstadoSolicitudes estado){
+    public void setEstado(EstadoSolicitud estado) {
         this.estado = estado;
+    }
+
+    /** La grúa asignada (null mientras la solicitud no tenga una). */
+    public Grua getGrua() {
+        return grua;
+    }
+
+    public void setGrua(Grua grua) {
+        this.grua = grua;
     }
 }
