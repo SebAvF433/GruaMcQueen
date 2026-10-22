@@ -1,22 +1,35 @@
 package vehiculo;
 
-public class Vehiculo{
-    String marca;
-    String modelo;
-    String placa;
-    String color;
+import auth.Usuario;
 
-    public Vehiculo(String marca, String modelo, String placa, String color){
-        this.marca = marca;
-        this.modelo = modelo;
+/** Un vehículo registrado por un cliente. Es como la "ficha" del vehículo. */
+public class Vehiculo {
+
+    private final String placa;
+    private final TipoVehiculo tipo;
+    private final String marca;
+    private final Usuario propietario;
+
+    public Vehiculo(String placa, TipoVehiculo tipo, String marca, Usuario propietario) {
         this.placa = placa;
-        this.color = color;
+        this.tipo = tipo;
+        this.marca = marca;
+        this.propietario = propietario;
     }
 
-    void mostrarVehiculo(){
-        System.out.println("Marca: " + marca);
-        System.out.println("Modelo: " + modelo);
-        System.out.println("Placa: " + placa);
-        System.out.println("Color: " + color);
+    public String getPlaca() {
+        return placa;
+    }
+
+    public TipoVehiculo getTipo() {
+        return tipo;
+    }
+
+    public String getMarca() {
+        return marca;
+    }
+
+    public Usuario getPropietario() {
+        return propietario;
     }
 }

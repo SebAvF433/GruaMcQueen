@@ -2,9 +2,6 @@ package solicitud;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-
-import auth.Usuario;
 
 /** "Base de datos en memoria" de solicitudes. Solo guarda y entrega datos; no aplica reglas. */
 public class SolicitudRepositorio {
@@ -25,11 +22,4 @@ public class SolicitudRepositorio {
     public List<Solicitud> listaSolicitudes() {
         return List.copyOf(solicitudes);
     }
-
-    public List<Solicitud> listaCliente(Usuario cliente){
-    return solicitudes.stream()
-            .filter(s -> s.getCliente().getUsuario().equals(cliente.getUsuario()))
-            .collect(Collectors.toList());
-    }
-
 }
