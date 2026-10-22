@@ -1,9 +1,9 @@
 package vehiculo;
 
 import auth.Usuario;
-import comun.DatoInvalidoException;
-import comun.ReglaNegocioException;
 import comun.Validador;
+import excepcion.DatoInvalidoException;
+import excepcion.ReglaNegocioException;
 
 import java.util.List;
 import java.util.Optional;

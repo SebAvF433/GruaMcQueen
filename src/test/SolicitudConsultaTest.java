@@ -1,8 +1,8 @@
 package test;
 
-import auth.Rol;
+import modelo.Rol;
 import auth.Usuario;
-import comun.DatoInvalidoException;
+import excepcion.DatoInvalidoException;
 import inventario.GruaRepositorio;
 import inventario.GruaServicio;
 import java.util.List;
@@ -33,8 +33,8 @@ public class SolicitudConsultaTest {
         System.out.println("\n== Solicitudes (HU-18) ==");
 
         // --- Preparación (si algún nombre de su proyecto es distinto, se ajusta solo aquí) ---
-        Usuario ana = new Usuario("U1", "Ana", "ana", "1234", Rol.CLIENTE);
-        Usuario luis = new Usuario("U2", "Luis", "luis", "1234", Rol.CLIENTE);
+        Usuario ana = new Usuario("Ana", "ana", "1234", Rol.CLIENTE);
+        Usuario luis = new Usuario("Luis", "luis", "1234", Rol.CLIENTE);
 
         VehiculoServicio vehiculos = new VehiculoServicio(new VehiculoRepositorio());
         GruaServicio gruas = new GruaServicio(new GruaRepositorio());
@@ -48,9 +48,9 @@ public class SolicitudConsultaTest {
         vehiculos.registrar(ana, "BBB222", TipoVehiculo.MOTO, "Yamaha");
         vehiculos.registrar(luis, "CCC333", TipoVehiculo.CAMIONETA, "Toyota");
 
-        Solicitud s1 = servicio.crearSolicitud(ana, "AAA111", "Calle 1", "Calle 2");  // SOLICITADA
-        Solicitud s2 = servicio.crearSolicitud(ana, "BBB222", "Calle 3", "Calle 4");  // CANCELADA
-        Solicitud s3 = servicio.crearSolicitud(luis, "CCC333", "Calle 5", "Calle 6"); // FINALIZADA
+        Solicitud s1 = servicio.crearSolicitud(ana, "AAA111", "Calle 1", "Calle 2", 10);  // SOLICITADA
+        Solicitud s2 = servicio.crearSolicitud(ana, "BBB222", "Calle 3", "Calle 4", 10);  // CANCELADA
+        Solicitud s3 = servicio.crearSolicitud(luis, "CCC333", "Calle 5", "Calle 6", 10); // FINALIZADA
         s2.setEstado(EstadoSolicitud.CANCELADA);
         s3.setEstado(EstadoSolicitud.FINALIZADA);
 
