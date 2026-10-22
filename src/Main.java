@@ -15,7 +15,7 @@ public class Main {
         try {
             new MenuPrincipal(consola, auth).iniciar();
         } catch (EntradaCerradaException e) {
-            System.out.println("\nSe cerró la entrada de datos. Fin del programa.");
+            System.out.println("Se cerró la entrada de datos. Fin del programa.");
         }
     }
 }
